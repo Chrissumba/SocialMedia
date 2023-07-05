@@ -1,0 +1,22 @@
+{
+    "cSpell.words": [
+        "addcomment",
+        "addfollow",
+        "addpost",
+        "addstory",
+        "allposts",
+        "commentsrouter",
+        "deletecomment",
+        "deletefollow",
+        "deletepost",
+        "deletestory",
+        "followrouter",
+        "getfollow",
+        "getstory",
+        "likesrouter",
+        "postrouter",
+        "resave",
+        "storyrouter",
+        "userrouter"
+    ]
+}
