@@ -54,11 +54,12 @@ CREATE TABLE Notifications(
     notification_id INT IDENTITY(1,1) PRIMARY KEY,
     userid INT NOT NULL,
     sourceid INT NOT NULL,
-    iread  BIT NOT NULL DEFAULT 0,
+	 description VARCHAR(MAX),
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     FOREIGN KEY (userid) REFERENCES Users(id),
 	FOREIGN KEY (sourceid) REFERENCES Users(id)
     )
+	DROP TABLE Notifications
 CREATE TRIGGER TR_Comments_Delete
 ON Comments
 AFTER DELETE
