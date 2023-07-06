@@ -59,7 +59,21 @@ CREATE TABLE Notifications(
     FOREIGN KEY (userid) REFERENCES Users(id),
 	FOREIGN KEY (sourceid) REFERENCES Users(id)
     )
-	DROP TABLE Notifications
+
+ CREATE TABLE Replies (
+  id INT PRIMARY KEY IDENTITY(1,1),
+  postId INT NOT NULL,
+  commentId INT NOT NULL,
+  description VARCHAR(MAX) NOT NULL,
+  personId INT NOT NULL,
+  createdAt DATETIME,
+  FOREIGN KEY (postId) REFERENCES Posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (commentId) REFERENCES Comments(id),
+  FOREIGN KEY (personId) REFERENCES Users(id) 
+);
+
+
+DROP TABLE Notifications
 CREATE TRIGGER TR_Comments_Delete
 ON Comments
 AFTER DELETE

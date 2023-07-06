@@ -32,7 +32,8 @@ const likesrouter = require('./src/routes/likes');
 const userrouter = require('./src/routes/users');
 const followrouter = require('./src/routes/follows');
 const storyrouter = require('./src/routes/stories');
-const notificationrouter = require('./src/routes/notifications')
+const notificationrouter = require('./src/routes/notifications');
+const replyrouter = require('./src/routes/replies')
 
 
 app.get('/', (req, res) => {
@@ -46,7 +47,8 @@ app.use(likesrouter);
 app.use(userrouter);
 app.use(followrouter);
 app.use(storyrouter);
-app.use(notificationrouter)
+app.use(notificationrouter);
+app.use(replyrouter)
 
 const port = process.env.PORT;
 app.listen(port, () => {
