@@ -37,7 +37,7 @@ async function getComments(req, res) {
 }
 
 async function addComment(req, res) {
-    const token = req.cookies.accessToken;
+    const token = req.session.accessToken;
     if (!token) return res.status(401).json("Not logged in!");
 
     jwt.verify(token, config.secret, (err, userInfo) => {
@@ -74,30 +74,26 @@ async function addComment(req, res) {
 }
 
 async function deleteComment(req, res) {
-    const token = req.cookies.accessToken;
+    const token = req.session.accessToken;
     if (!token) return res.status(401).json("Not authenticated!");
 
     jwt.verify(token, config.secret, (err, userInfo) => {
         if (err) return res.status(403).json("Token is not valid!");
 
         const commentId = req.params.id;
-        const q = "DELETE FROM Comments WHERE id = id AND userId = @userId ";
-
-
+        const q = "DELETE FROM Comments WHERE id = id AND userId = @userId";
 
         const pool = new mssql.ConnectionPool(config);
         pool.connect().then(() => {
             const request = new mssql.Request(pool);
             request.input("id", req.params.id);
-            request.input("userId", userInfo.id); //  userId: userInfo.id
+            request.input("userId", userInfo.id);
             request.query(q)
                 .then((result) => {
                     if (result.rowsAffected[0] > 0) {
                         return res.status(200).json("Comment has been deleted.");
-
                     } else {
                         return res.status(403).json("You can only delete your comment.");
-
                     }
                 })
                 .catch((err) => {
@@ -111,5 +107,6 @@ async function deleteComment(req, res) {
         });
     });
 }
+
 
 module.exports = { getComments, addComment, deleteComment };

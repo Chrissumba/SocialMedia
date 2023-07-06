@@ -34,7 +34,7 @@ async function getFollow(req, res) {
 
 
 async function addFollow(req, res) {
-    const token = req.cookies.accessToken;
+    const token = req.session.accessToken;
     if (!token) return res.status(401).json('Not logged in!');
 
     try {
@@ -80,12 +80,9 @@ async function addFollow(req, res) {
     }
 }
 
-
-
-
 async function deleteFollow(req, res) {
     try {
-        const token = req.cookies.accessToken;
+        const token = req.session.accessToken;
         if (!token) {
             return res.status(401).json('Not logged in!');
         }
@@ -116,6 +113,5 @@ async function deleteFollow(req, res) {
         return res.status(500).json({ error: error.message });
     }
 }
-
 
 module.exports = { getFollow, addFollow, deleteFollow };

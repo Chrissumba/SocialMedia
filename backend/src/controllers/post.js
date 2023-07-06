@@ -33,74 +33,58 @@ async function getPosts(req, res) {
     }
 }
 async function addPost(req, res) {
-    const token = req.cookies.accessToken;
+    const token = req.session.accessToken;
     if (!token) return res.status(401).json("Not logged in!");
 
-    jwt.verify(token, config.secret, (err, userInfo) => {
+    jwt.verify(token, config.secret, async(err, userInfo) => {
         if (err) return res.status(403).json("Token is not valid!");
 
-        const q = "INSERT INTO posts(description, img, userId, createdAt) VALUES (@description, @img, @userId, GETDATE())";
-        const values = {
-            description: req.body.description,
-            img: req.body.img,
-            userId: userInfo.id
-        };
+        try {
+            const q = "INSERT INTO posts(description, img, userId, createdAt) VALUES (@description, @img, @userId, GETDATE())";
+            const values = {
+                description: req.body.description,
+                img: req.body.img,
+                userId: userInfo.id
+            };
 
-        const pool = new mssql.ConnectionPool(config);
-        pool.connect().then(() => {
-            const request = new mssql.Request(pool);
+            const pool = await mssql.connect(config);
+            const request = pool.request();
             for (const param in values) {
                 request.input(param, values[param]);
             }
-            request.query(q)
-                .then(() => {
-                    return res.status(200).json("Post has been created.");
-                })
-                .catch((err) => {
-                    return res.status(500).json(err);
-                })
-                .finally(() => {
-                    pool.close();
-                });
-        }).catch((err) => {
-            return res.status(500).json(err);
-        });
+
+            await request.query(q);
+            return res.status(200).json("Post has been created.");
+        } catch (error) {
+            console.error('An error occurred:', error);
+            return res.status(500).json({ error: error.message });
+        }
     });
 }
 
 async function deletePost(req, res) {
-    const token = req.cookies.accessToken;
-    if (!token) return res.status(401).json("Not logged in!");
+    try {
+        const token = req.session.accessToken;
+        if (!token) return res.status(401).json("Not logged in!");
 
-    jwt.verify(token, config.secret, (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        const userInfo = await jwt.verify(token, config.secret);
+        const q = "DELETE FROM Posts WHERE id = @id AND userId = @userId";
 
-        const q = "DELETE FROM Posts WHERE id = id AND userId = @userId";
+        const pool = await mssql.connect(config);
+        const request = pool.request();
+        request.input("id", req.params.id);
+        request.input("userId", userInfo.id);
+        const result = await request.query(q);
 
-        const pool = new mssql.ConnectionPool(config);
-        pool.connect().then(() => {
-            const request = new mssql.Request(pool);
-            request.input("id", req.params.id);
-            request.input("userId", userInfo.id); //  userId: userInfo.id
-            request.query(q)
-                .then((result) => {
-                    if (result.rowsAffected[0] > 0) {
-                        return res.status(200).json("Post has been deleted.");
-
-                    } else {
-                        return res.status(403).json("You can only delete your post.");
-
-                    }
-                })
-                .catch((err) => {
-                    return res.status(500).json(err);
-                })
-                .finally(() => {
-                    pool.close();
-                });
-        }).catch((err) => {
-            return res.status(500).json(err);
-        });
-    });
+        if (result.rowsAffected[0] > 0) {
+            return res.status(200).json("Post has been deleted.");
+        } else {
+            return res.status(403).json("You can only delete your post.");
+        }
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return res.status(500).json({ error: error.message });
+    }
 }
+
 module.exports = { getPosts, addPost, deletePost };

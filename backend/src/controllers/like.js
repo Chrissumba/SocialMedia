@@ -24,59 +24,54 @@ async function getLikes(req, res) {
 };
 
 async function addLike(req, res) {
-    const token = req.cookies.accessToken;
+    const token = req.session.accessToken;
     if (!token) return res.status(401).json('Not logged in!');
 
-    jwt.verify(token, config.secret, (err, userInfo) => {
+    jwt.verify(token, config.secret, async(err, userInfo) => {
         if (err) return res.status(403).json('Token is not valid!');
 
-        const q = 'INSERT INTO Likes (userId, postId) VALUES (@userId, @postId)';
-        const values = {
-            userId: userInfo.id,
-            postId: req.body.postId,
-        };
+        try {
+            const q = 'INSERT INTO Likes (userId, postId) VALUES (@userId, @postId)';
+            const values = {
+                userId: userInfo.id,
+                postId: req.body.postId,
+            };
 
-        const pool = new mssql.ConnectionPool(config);
-        pool.connect()
-            .then(() => {
-                const request = new mssql.Request(pool);
-                for (const param in values) {
-                    request.input(param, values[param]);
-                }
-                request.query(q)
-                    .then(() => {
-                        return res.status(200).json('Like has been created.');
-                    })
-                    .catch((err) => {
-                        return res.status(500).json(err);
-                    })
-                    .finally(() => {
-                        pool.close();
-                    });
-            })
-            .catch((err) => {
-                return res.status(500).json(err);
-            });
+            const pool = await mssql.connect(config);
+            const request = new mssql.Request(pool);
+            for (const param in values) {
+                request.input(param, values[param]);
+            }
+
+            const insertResult = await request.query(q);
+            if (insertResult.rowsAffected[0] === 0) {
+                return res.status(500).json('Failed to create like.');
+            }
+
+            return res.status(200).json('Like has been created.');
+        } catch (error) {
+            console.error('An error occurred:', error);
+            return res.status(500).json({ error: error.message });
+        }
     });
 }
 
-
 async function deleteLike(req, res) {
-    const token = req.cookies.accessToken;
-    if (!token) return res.status(401).json("Not logged in!");
+    const token = req.session.accessToken;
+    if (!token) return res.status(401).json('Not logged in!');
 
     jwt.verify(token, config.secret, async(err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json('Token is not valid!');
 
         try {
             const postId = req.params.postId;
             if (!postId) {
-                return res.status(400).json("Missing postId parameter.");
+                return res.status(400).json('Missing postId parameter.');
             }
 
             const parsedPostId = parseInt(postId, 10);
             if (isNaN(parsedPostId)) {
-                return res.status(400).json("Invalid postId parameter.");
+                return res.status(400).json('Invalid postId parameter.');
             }
 
             const pool = await mssql.connect(config);
@@ -87,21 +82,22 @@ async function deleteLike(req, res) {
         `;
             const deleteResult = await pool
                 .request()
-                .input("userId", mssql.Int, userInfo.id)
-                .input("postId", mssql.Int, parsedPostId)
+                .input('userId', mssql.Int, userInfo.id)
+                .input('postId', mssql.Int, parsedPostId)
                 .query(deleteQuery);
 
             if (deleteResult.rowsAffected[0] === 0) {
-                return res.status(404).json("Like not found.");
+                return res.status(404).json('Like not found.');
             }
 
-            return res.status(200).json({ message: "Like has been deleted." });
+            return res.status(200).json({ message: 'Like has been deleted.' });
         } catch (error) {
-            console.error("An error occurred:", error);
+            console.error('An error occurred:', error);
             return res.status(500).json({ error: error.message });
         }
     });
 }
+
 
 
 module.exports = { getLikes, addLike, deleteLike };

@@ -5,7 +5,7 @@ const { getPosts, addPost, deletePost } = require('../controllers/post.js');
 
 postrouter.get("/allposts/:userId", getPosts);
 postrouter.post("/addpost", addPost);
-postrouter.delete("/deletepost/:id", deletePost)
+postrouter.delete("/deletepost/:postId", deletePost)
 
 
 module.exports = postrouter

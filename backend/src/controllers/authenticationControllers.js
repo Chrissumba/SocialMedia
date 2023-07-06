@@ -79,9 +79,10 @@ async function login(req, res) {
         const { username, password } = req.body;
         const pool = await mssql.connect(config);
 
-        const result = await pool.request()
-            .input('username', mssql.VarChar, username)
-            .query('SELECT * FROM Users WHERE username = @username');
+        const result = await pool
+            .request()
+            .input("username", mssql.VarChar, username)
+            .query("SELECT * FROM Users WHERE username = @username");
 
         if (result.recordset.length === 0) {
             return res.status(404).json("User not found!");
@@ -98,9 +99,9 @@ async function login(req, res) {
 
         const { password: hashedPassword, ...userData } = user;
 
-        res.cookie("accessToken", token, {
-            httpOnly: true,
-        }).status(200).json(userData);
+        req.session.accessToken = token; // Store the token in the session
+
+        res.status(200).json(userData);
     } catch (error) {
         res.status(500).send({
             success: false,
@@ -110,11 +111,10 @@ async function login(req, res) {
     }
 }
 
+
 async function logout(req, res) {
-    res.clearCookie("accessToken", {
-        secure: true,
-        sameSite: "none"
-    }).status(200).json("You have successfully logged out.")
-};
+    req.session.destroy(); // Destroy the session
+    res.status(200).json("You have successfully logged out.");
+}
 
 module.exports = { register, login, logout }
