@@ -2,8 +2,24 @@ const mssql = require('mssql')
 const jwt = require('jsonwebtoken')
 const { user } = require('../config/config')
 const config = require('../config/config')
+const cron = require('node-cron')
 const moment = require('moment')
 require('dotenv').config()
+
+
+async function deleteExpiredStories() {
+    try {
+        const pool = await mssql.connect(config);
+        const query = `
+        DELETE FROM Stories
+        WHERE createdAt < DATEADD(MINUTE, -3, GETDATE())
+      `;
+        await pool.request().query(query);
+        console.log('Expired stories have been deleted.');
+    } catch (error) {
+        console.error('An error occurred while deleting expired stories:', error);
+    }
+}
 
 async function getStories(req, res) {
     try {
@@ -91,4 +107,4 @@ async function deleteStory(req, res) {
 
 
 
-module.exports = { getStories, addStory, deleteStory };
+module.exports = { getStories, addStory, deleteStory, deleteExpiredStories };

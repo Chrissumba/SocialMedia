@@ -1,5 +1,5 @@
 const express = require('express');
-const { getStories, addStory, deleteStory } = require('../controllers/story.js');
+const { getStories, addStory, deleteStory, deleteExpiredStories } = require('../controllers/story.js');
 
 const storyrouter = express.Router();
 

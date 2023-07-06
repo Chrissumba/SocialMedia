@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express');
+const cron = require('node-cron');
 const cors = require('cors');
 //const cookieParser = require('cookie-parser')
 const session = require('express-session')
@@ -49,6 +50,13 @@ app.use(followrouter);
 app.use(storyrouter);
 app.use(notificationrouter);
 app.use(replyrouter)
+
+
+const { deleteExpiredStories } = require('../backend/src/controllers/story');
+cron.schedule('* * * * *', () => {
+    deleteExpiredStories();
+});
+
 
 const port = process.env.PORT;
 app.listen(port, () => {
