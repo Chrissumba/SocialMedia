@@ -12,9 +12,12 @@
         "deletestory",
         "followrouter",
         "getfollow",
+        "getnotification",
         "getstory",
         "likesrouter",
+        "notificationrouter",
         "postrouter",
+        "replyrouter",
         "resave",
         "storyrouter",
         "userrouter"

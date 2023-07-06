@@ -13,62 +13,73 @@ const { tokenGenerator } = require('../utils/token')
 
 //Function to register a new member
 async function register(req, res) {
+    const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
+    const name = req.body.name;
+
     try {
-        let sql = await mssql.connect(config);
+        const pool = await mssql.connect(config);
 
-        if (sql.connected) {
-            const { username, email, password, name, } = req.body;
-            const hashedPassword = await bcrypt.hash(password, 10);
+        const query = 'SELECT * FROM Users WHERE username = @username';
+        const request = pool.request();
+        request.input('username', mssql.VarChar, username);
 
-            let request = sql
-                .request()
-                .input("username", mssql.VarChar, username)
-                .input("email", mssql.VarChar, email)
-                .input("password", mssql.VarChar, hashedPassword)
-                .input("name", mssql.VarChar, name);
+        const result = await request.query(query);
 
+        if (result.recordset.length > 0) {
+            return res.status(409).json('There already exists a user with that username,try using a different user name');
+        }
 
-            let result = await request.execute("InsertUser");
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-            if (result.rowsAffected[0] > 0) {
-                // Templating
-                let html = await createMarkup("./src/views/signup.ejs", {
-                    name: username,
-                    text: "At our social media platform, you'll find a wide range of things in various genres, from stories to pictures.Feel free to explore the social media platform, find your next favorite person, and enjoy the friendship journey.If you have any questions or need assistance, don't hesitate to reach out to our friendly staff.",
-                });
+        const insertQuery = `
+        INSERT INTO users (username, email, password, name)
+        VALUES (@username, @email, @password, @name);
+      `;
 
-                const message = {
-                    to: email,
-                    from: process.env.EMAIL_USER,
-                    subject: "Hello from Sumba's Social Media",
-                    html: html,
-                };
+        const insertRequest = pool.request();
+        insertRequest.input('username', mssql.VarChar, username);
+        insertRequest.input('email', mssql.VarChar, email);
+        insertRequest.input('password', mssql.VarChar, hashedPassword);
+        insertRequest.input('name', mssql.VarChar, name);
 
-                await sendMail(message);
-                console.log(result);
+        const insertResult = await insertRequest.query(insertQuery);
 
-                res.status(201).send({
-                    success: true,
-                    message: "user has been created",
-                    data: result.recordset, // Include the recordset data in the response
-                });
-            } else {
-                res.status(500).send({
-                    success: false,
-                    message: "No rows affected",
-                });
-            }
+        if (insertResult.rowsAffected[0] > 0) {
+            // Templating
+            const html = await createMarkup('./src/views/signup.ejs', {
+                name: username,
+                text: "At our social media platform, you'll find a wide range of things in various genres, from stories to pictures. Feel free to explore the social media platform, find your next favorite person, and enjoy the friendship journey. If you have any questions or need assistance, don't hesitate to reach out to our friendly staff.",
+            });
+
+            const message = {
+                to: email,
+                from: process.env.EMAIL_USER,
+                subject: 'Hello from Sumba\'s Social Media',
+                html: html,
+            };
+
+            await sendMail(message);
+            console.log(insertResult);
+
+            return res.status(201).json({
+                success: true,
+                message: 'User has been created',
+                data: insertResult.recordset,
+            });
         } else {
-            res.status(500).send({
+            return res.status(500).json({
                 success: false,
-                message: "Database connection failed",
+                message: 'No rows affected',
             });
         }
     } catch (error) {
-        res.status(500).send({
+        console.error('An error occurred:', error);
+        return res.status(500).json({
             success: false,
-            message: "An error occurred",
-            error: error.message, // Include the error message in the response
+            message: 'An error occurred',
+            error: error.message,
         });
     }
 }
