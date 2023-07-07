@@ -12,7 +12,7 @@ async function deleteExpiredStories() {
         const pool = await mssql.connect(config);
         const query = `
         DELETE FROM Stories
-        WHERE createdAt < DATEADD(MINUTE, -3, GETDATE())
+        WHERE createdAt < DATEADD(MINUTE, -30, GETDATE())
       `;
         await pool.request().query(query);
         console.log('Expired stories have been deleted.');
@@ -27,14 +27,15 @@ async function getStories(req, res) {
         if (!token) return res.status(401).json("Not logged in!");
 
         const userInfo = await jwt.verify(token, config.secret);
-        const pool = await mssql.connect(sqlConfig);
+        const pool = await mssql.connect(config);
         const query = `
-            SELECT s.*, u.name
-            FROM Stories AS s
-            JOIN users AS u ON u.id = s.userId
-            LEFT JOIN Follow AS r ON s.userId = r.followedUserId AND r.followerUserId = @followerUserId
-            ORDER BY s.created_at DESC
-            OFFSET 0 ROWS FETCH NEXT 4 ROWS ONLY;
+        SELECT U.username,U.id, S.img AS storyImage, S.createdAt, U.profilePic
+        FROM Users U
+        JOIN Follow F ON F.followedUserId = U.id
+        JOIN Stories S ON S.userId = U.id
+        WHERE F.followerUserId = @followerUserId
+        ORDER BY S.createdAt DESC;
+        
         `;
         const request = pool.request();
         request.input("followerUserId", mssql.Int, userInfo.id);
@@ -42,12 +43,18 @@ async function getStories(req, res) {
         const result = await request.query(query);
         const stories = result.recordset;
 
+        // Additional step: Check if the user has any stories
+        if (stories.length === 0) {
+            return res.status(200).json({ message: "No stories found." });
+        }
+
         return res.status(200).json(stories);
     } catch (error) {
         console.error("An error occurred:", error);
         return res.status(500).json({ error: error.message });
     }
 }
+
 
 async function addStory(req, res) {
     try {
