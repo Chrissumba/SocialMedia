@@ -31,19 +31,53 @@ async function addLike(req, res) {
         if (err) return res.status(403).json('Token is not valid!');
 
         try {
-            const q = 'INSERT INTO Likes (userId, postId) VALUES (@userId, @postId)';
-            const values = {
-                userId: userInfo.id,
-                postId: req.body.postId,
-            };
+            const userId = userInfo.id;
+            const postId = req.body.postId;
+
+            // Check if the user is the owner of the post
+            const checkPostQuery = `
+          SELECT userId
+          FROM Posts
+          WHERE id = @postId;
+        `;
 
             const pool = await mssql.connect(config);
-            const request = new mssql.Request(pool);
-            for (const param in values) {
-                request.input(param, values[param]);
+            const checkPostRequest = pool.request();
+            checkPostRequest.input('postId', mssql.Int, postId);
+            const checkPostResult = await checkPostRequest.query(checkPostQuery);
+            const postUserId = checkPostResult.recordset[0].userId;
+
+            if (userId === postUserId) {
+                return res.status(400).json('Cannot like your own post.');
             }
 
-            const insertResult = await request.query(q);
+            // Check if the user has already liked the post
+            const checkLikeQuery = `
+          SELECT COUNT(*) AS count
+          FROM Likes
+          WHERE userId = @userId
+          AND postId = @postId;
+        `;
+
+            const insertQuery = `
+          INSERT INTO Likes (userId, postId)
+          VALUES (@userId, @postId);
+        `;
+
+            const checkRequest = pool.request();
+            checkRequest.input('userId', mssql.Int, userId);
+            checkRequest.input('postId', mssql.Int, postId);
+
+            const checkResult = await checkRequest.query(checkLikeQuery);
+            if (checkResult.recordset[0].count > 0) {
+                return res.status(400).json('You have already liked this post.');
+            }
+
+            const insertRequest = pool.request();
+            insertRequest.input('userId', mssql.Int, userId);
+            insertRequest.input('postId', mssql.Int, postId);
+
+            const insertResult = await insertRequest.query(insertQuery);
             if (insertResult.rowsAffected[0] === 0) {
                 return res.status(500).json('Failed to create like.');
             }
@@ -55,6 +89,7 @@ async function addLike(req, res) {
         }
     });
 }
+
 
 async function deleteLike(req, res) {
     const token = req.session.accessToken;

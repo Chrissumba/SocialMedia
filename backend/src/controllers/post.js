@@ -7,7 +7,7 @@ require('dotenv').config()
 
 async function getPosts(req, res) {
     const userId = req.query.userId;
-    const token = req.cookies.accessToken;
+    const token = req.session.accessToken;
     if (!token) return res.status(401).json("Not logged in!");
 
     try {
@@ -67,24 +67,34 @@ async function deletePost(req, res) {
         const token = req.session.accessToken;
         if (!token) return res.status(401).json("Not logged in!");
 
-        const userInfo = await jwt.verify(token, config.secret);
-        const q = "DELETE FROM Posts WHERE id = @id AND userId = @userId";
+        const userInfo = jwt.verify(token, config.secret);
+
+        const postId = req.params.id;
+        const userId = userInfo.id;
 
         const pool = await mssql.connect(config);
-        const request = pool.request();
-        request.input("id", req.params.id);
-        request.input("userId", userInfo.id);
-        const result = await request.query(q);
 
-        if (result.rowsAffected[0] > 0) {
-            return res.status(200).json("Post has been deleted.");
+        const deleteQuery = "DELETE FROM Posts WHERE id = @postId AND userId = @userId;";
+        const deleteRequest = pool.request();
+        deleteRequest.input("postId", mssql.Int, postId);
+        deleteRequest.input("userId", mssql.Int, userId);
+        await deleteRequest.query(deleteQuery);
+
+        const checkQuery = "SELECT * FROM Posts WHERE id = @postId;";
+        const checkRequest = pool.request();
+        checkRequest.input("postId", mssql.Int, postId);
+        const checkResult = await checkRequest.query(checkQuery);
+
+        if (checkResult.recordset.length === 0) {
+            return res.status(200).json("Post has been successfully deleted.");
         } else {
-            return res.status(403).json("You can only delete your post.");
+            return res.status(500).json("Failed to delete the post from the database.");
         }
     } catch (error) {
         console.error("An error occurred:", error);
         return res.status(500).json({ error: error.message });
     }
 }
+
 
 module.exports = { getPosts, addPost, deletePost };

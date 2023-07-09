@@ -42,6 +42,10 @@ async function addFollow(req, res) {
         const followerUserId = userInfo.id;
         const followedUserId = req.body.followedUserId;
 
+        if (followerUserId === followedUserId) {
+            return res.status(400).json('Cannot follow yourself.');
+        }
+
         const checkQuery = `
         SELECT COUNT(*) AS count
         FROM Follow
