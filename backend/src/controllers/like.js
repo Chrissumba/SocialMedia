@@ -2,26 +2,36 @@ const mssql = require('mssql')
 const jwt = require('jsonwebtoken')
 const { user } = require('../config/config')
 const config = require('../config/config')
-const moment = require('moment')
 require('dotenv').config()
 
 async function getLikes(req, res) {
     try {
-        const postId = req.query.postId;
+        const { postId } = req.params;
         const pool = await mssql.connect(config);
 
-        const result = await pool
-            .request()
-            .input('postId', mssql.Int, postId)
-            .query('SELECT userId FROM Likes WHERE postId = @postId');
+        const query = `
+        SELECT userId
+        FROM Likes
+        WHERE postId = @postId;
+      `;
 
-        const userIds = result.recordset.map((like) => like.userId);
-        return res.status(200).json(userIds);
+        const request = pool.request();
+        request.input('postId', mssql.Int, postId);
+
+        const result = await request.query(query);
+        const likes = result.recordset;
+
+        if (likes.length === 0) {
+            return res.status(200).json({ message: 'No likes found for the specified post.' });
+        }
+
+        return res.status(200).json(likes);
     } catch (error) {
         console.error('An error occurred:', error);
-        return res.status(500).json(error);
+        return res.status(500).json({ error: error.message });
     }
-};
+}
+
 
 async function addLike(req, res) {
     const token = req.session.accessToken;
