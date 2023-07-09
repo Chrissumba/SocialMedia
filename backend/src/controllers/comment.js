@@ -8,33 +8,33 @@ require('dotenv').config()
 
 
 async function getComments(req, res) {
+    try {
+        const q = `
+        SELECT c.id, c.description, c.createdAt, u.id AS userId, u.username, u.name, u.profilePic
+        FROM Comments AS c
+        JOIN Users AS u ON u.id = c.userId
+        WHERE c.postId = @postId
+        ORDER BY c.createdAt DESC;
+      `;
 
-    const q = `
-    SELECT c.*, u.id AS userId, name, profilePic 
-    FROM Comments AS c 
-    JOIN Users AS u ON u.id = c.userId
-    WHERE c.postId = @postId
-    ORDER BY c.createdAt DESC
-    `;
+        const pool = await mssql.connect(config);
+        const request = pool.request();
+        request.input("postId", mssql.Int, req.params.postId);
 
-    const pool = new mssql.ConnectionPool(config);
-    pool.connect().then(() => {
-        const request = new mssql.Request(pool);
-        request.input('postId', req.query.postId);
-        request.query(q)
-            .then((result) => {
-                return res.status(200).json(result.recordset);
-            })
-            .catch((err) => {
-                return res.status(500).json(err);
-            })
-            .finally(() => {
-                pool.close();
-            });
-    }).catch((err) => {
-        return res.status(500).json(err);
-    });
+        const result = await request.query(q);
+        const comments = result.recordset;
+
+        if (comments.length === 0) {
+            return res.status(200).json("No comments found for the specified post.");
+        }
+
+        return res.status(200).json(comments);
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return res.status(500).json({ error: error.message });
+    }
 }
+
 
 async function addComment(req, res) {
     const token = req.session.accessToken;
