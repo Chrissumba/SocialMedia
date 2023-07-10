@@ -9,32 +9,31 @@ require('dotenv').config()
 
 async function getReplies(req, res) {
     const { commentId } = req.params;
+    const pool = await mssql.connect(config);
+    try {
+        const q = `
+        SELECT U.name, R.description
+        FROM Replies R
+        JOIN Users U ON U.id = R.personId
+        WHERE R.commentId = @commentId
+        ORDER BY R.createdAt DESC;
+      `;
 
-    const q = `
-      SELECT U.name, R.description
-      FROM Replies R
-      JOIN Users U ON U.id = R.personId
-      WHERE R.commentId = @commentId
-      ORDER BY R.createdAt DESC;
-    `;
+        const request = pool.request();
+        request.input('commentId', mssql.Int, commentId);
 
-    const pool = new mssql.ConnectionPool(config);
-    pool.connect().then(() => {
-        const request = new mssql.Request(pool);
-        request.input("commentId", mssql.Int, commentId);
-        request.query(q)
-            .then((result) => {
-                return res.status(200).json(result.recordset);
-            })
-            .catch((err) => {
-                return res.status(500).json(err);
-            })
-            .finally(() => {
-                pool.close();
-            });
-    }).catch((err) => {
-        return res.status(500).json(err);
-    });
+        const result = await request.query(q);
+        const replies = result.recordset;
+
+        if (replies.length === 0) {
+            return res.status(200).json({ message: 'No replies found for the specified comment.' });
+        }
+
+        return res.status(200).json(replies);
+    } catch (error) {
+        console.error('An error occurred:', error);
+        return res.status(500).json({ error: error.message });
+    }
 }
 
 

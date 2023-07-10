@@ -12,7 +12,7 @@ async function deleteExpiredStories() {
         const pool = await mssql.connect(config);
         const query = `
         DELETE FROM Stories
-        WHERE createdAt < DATEADD(MINUTE, -30, GETDATE())
+        WHERE createdAt < DATEADD(MINUTE, -1, GETDATE())
       `;
         await pool.request().query(query);
         console.log('Expired stories have been deleted.');
