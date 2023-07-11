@@ -96,5 +96,51 @@ async function deletePost(req, res) {
     }
 }
 
+async function getSinglePost(req, res) {
+    const userId = req.query.userId;
+    const postId = req.params.id;
+    const token = req.session.accessToken;
 
-module.exports = { getPosts, addPost, deletePost };
+    if (!token) {
+        return res.status(401).json("Not logged in!");
+    }
+
+    try {
+        const userInfo = await jwt.verify(token, config.secret);
+        const pool = await mssql.connect(config);
+
+        const q = `
+        SELECT
+            p.id AS post_id,
+            p.description AS post_description,
+            p.img AS post_image,
+            u.username AS post_author,
+            c.id AS comment_id,
+            c.description AS comment_description,
+            c.createdAt AS comment_created_at,
+            uc.username AS comment_author,
+            r.id AS reply_id,
+            r.description AS reply_description,
+            r.createdAt AS reply_created_at,
+            ur.username AS reply_author
+        FROM Posts p
+        JOIN Users u ON p.userId = u.id
+        JOIN Comments c ON c.postId = p.id
+        JOIN Users uc ON c.userId = uc.id
+        LEFT JOIN Replies r ON r.commentId = c.id
+        LEFT JOIN Users ur ON r.personId = ur.id
+        WHERE p.id = @postId;`;
+
+        const request = pool.request();
+        request.input("postId", mssql.Int, postId);
+
+        const result = await request.query(q);
+        return res.status(200).json(result.recordset);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
+
+
+module.exports = { getPosts, addPost, deletePost, getSinglePost };
