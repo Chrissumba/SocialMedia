@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { register } from "../../redux/authSlice";
+import { register } from "../../redux/slices/authorizationSlice";
 import "./register.scss";
 
 const Register = () => {
