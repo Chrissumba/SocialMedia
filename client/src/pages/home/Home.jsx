@@ -1,15 +1,14 @@
-import LeftBar from "../../components/leftbar/LeftBar"
-import Navbar from "../../components/navbar/Navbar"
-import RightBar from "../../components/rightbar/RightBar"
-
+import Share from "../../components/share/Share"
+import Stories from "../../components/stories/stories"
+import Posts from "../../components/posts/posts"
+import "./home.scss"
 
 const Home = () => {
   return (
     <div className="home">
-      <LeftBar/>
-      <Navbar/>
-      <RightBar/>
-    
+      <Stories/>
+      <Share/>
+      <Posts/>
     </div>
   )
 }

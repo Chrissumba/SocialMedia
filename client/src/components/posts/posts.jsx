@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchPosts, selectPosts, selectLoading, selectError } from "./postsSlice";
-import Post from "../post/Post";
+import Post from "../post/post";
 import "./posts.scss";
 
 const Posts = ({ userId }) => {

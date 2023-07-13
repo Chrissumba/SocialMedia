@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchStories, selectStories, selectLoading, selectError, addStory } from "../../redux/slices/storiesSlice";
-import { useCloudinaryUpload } from "../../hooks/useCloudinaryUpload";
+import { useCloudinaryUpload } from "../../cloudinary/useCloudinaryUpload";
 import { AuthContext } from "../../context/authContext";
 import "./stories.scss";
 

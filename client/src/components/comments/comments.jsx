@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addComment, fetchComments, selectComments, selectLoading, selectError } from "./commentsSlice";
+import { addComment, fetchComments, selectComments, selectLoading, selectError } from "../../redux/slices/commentsSlice";
 import moment from "moment";
-
+import "./comments.scss";
 const Comments = ({ postId }) => {
   const [desc, setDesc] = useState("");
   const dispatch = useDispatch();

@@ -9,9 +9,9 @@ import {
   selectDesc,
   selectLoading,
   selectError,
-} from "./shareSlice";
+} from "../../redux/slices/shareSlice";
 import { AuthContext } from "../../context/authContext";
-import { useCloudinaryUpload } from "../../hooks/useCloudinaryUpload";
+import { useCloudinaryUpload } from "../../cloudinary/useCloudinaryUpload";
 import Image from "../../assets/Image.png";
 import Map from "../../assets/Map.png";
 import Friend from "../../assets/Friend.png";
