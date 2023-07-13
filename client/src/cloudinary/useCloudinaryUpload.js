@@ -8,7 +8,7 @@ export const useCloudinaryUpload = () => {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("upload_preset", "your_upload_preset");
+            formData.append("upload_preset", "oddtbybm");
 
             const response = await fetch(
                 `https://api.cloudinary.com/v1_1/${cloudinary.cloud_name}/upload`, {

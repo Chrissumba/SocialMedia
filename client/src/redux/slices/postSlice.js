@@ -6,7 +6,7 @@ export const fetchLikes = createAsyncThunk(
     async(postId) => {
         try {
             const response = await axios.get(`http://localhost:3000/likes?postId=${postId}`);
-            return response.data;
+            return { postId, likes: response.data };
         } catch (error) {
             throw new Error("Failed to fetch likes.");
         }
@@ -50,7 +50,7 @@ export const deleteLike = createAsyncThunk(
 );
 
 const postSlice = createSlice({
-    name: "posts",
+    name: "post",
     initialState: {
         posts: [],
         loading: false,
