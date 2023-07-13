@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addComment, fetchComments, selectComments, selectLoading, selectError } from "../../redux/slices/commentsSlice";
 import moment from "moment";
+import { AuthContext } from "../../context/authContext";
 import "./comments.scss";
+
 const Comments = ({ postId }) => {
   const [desc, setDesc] = useState("");
   const dispatch = useDispatch();
   const comments = useSelector(selectComments);
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
+
+  const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
     dispatch(fetchComments(postId));

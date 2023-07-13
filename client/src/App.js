@@ -1,21 +1,33 @@
-import React, { useContext } from "react";
-import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
+import Login from "./pages/login/Login";
+import Register from "./pages/register/Register";
+import {
+    createBrowserRouter,
+    RouterProvider,
+    Outlet,
+    Navigate,
+} from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import LeftBar from "./components/leftBar/LeftBar";
 import RightBar from "./components/rightBar/RightBar";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import "./style.scss";
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "./features/auth/authSlice";
-import { selectDarkMode } from "./features/darkMode/darkModeSlice";
+import { useContext } from "react";
+import { DarkModeContext } from "./context/darkModeContext";
+import { AuthContext } from "./context/authContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
-    const currentUser = useSelector(selectCurrentUser);
-    const darkMode = useSelector(selectDarkMode);
+    const { currentUser } = useContext(AuthContext);
+
+    const { darkMode } = useContext(DarkModeContext);
+
+    const queryClient = new QueryClient();
 
     const Layout = () => {
         return ( <
+            QueryClientProvider client = { queryClient } >
+            <
             div className = { `theme-${darkMode ? "dark" : "light"}` } >
             <
             Navbar / >
@@ -34,7 +46,8 @@ function App() {
             RightBar / >
             <
             /div> <
-            /div>
+            /div> <
+            /QueryClientProvider>
         );
     };
 
@@ -85,31 +98,3 @@ function App() {
 }
 
 export default App;
-
-
-// import React from "react";
-// import Home from "./pages/home/Home";
-// import {
-//     createBrowserRouter,
-//     Route,
-//     createRoutesFromElements,
-//     RouterProvider,
-// } from "react-router-dom";
-
-// // create Router,route
-// const myRouter = createBrowserRouter(
-//     createRoutesFromElements(
-//        < Route >
-
-//        <Route path = "/"
-//         element = { < Home / > }
-//         />  
-//         </Route>
-//     )
-// );
-// const App = () => {
-//     return <RouterProvider router = { myRouter }
-//     />;
-// };
-
-// export default App;

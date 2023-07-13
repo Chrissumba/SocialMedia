@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   setFile,
   setDesc,
-  uploadFile,
   createPost,
   selectFile,
   selectDesc,
@@ -38,7 +37,6 @@ const Share = () => {
       imgUrl = await uploadImage(file);
     }
     dispatch(createPost({ desc, img: imgUrl }));
-    dispatch(addStory({ url: imgUrl, name: "My Story" }));
   };
 
   return (
@@ -86,6 +84,8 @@ const Share = () => {
             <button onClick={handleClick}>Share</button>
           </div>
         </div>
+        {loading && <div>Loading...</div>}
+        {error && <div>Error: {error}</div>}
       </div>
     </div>
   );
