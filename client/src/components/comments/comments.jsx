@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addComment, selectComments } from "./commentsSlice";
+import { addComment, fetchComments, selectComments, selectLoading, selectError } from "./commentsSlice";
 import moment from "moment";
 
 const Comments = ({ postId }) => {
   const [desc, setDesc] = useState("");
   const dispatch = useDispatch();
   const comments = useSelector(selectComments);
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
+
+  useEffect(() => {
+    dispatch(fetchComments(postId));
+  }, [dispatch, postId]);
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -27,16 +33,22 @@ const Comments = ({ postId }) => {
         />
         <button onClick={handleClick}>Send</button>
       </div>
-      {comments.map((comment) => (
-        <div className="comment" key={comment.id}>
-          <img src={"/upload/" + comment.profilePic} alt="" />
-          <div className="info">
-            <span>{comment.name}</span>
-            <p>{comment.desc}</p>
+      {error ? (
+        "Something went wrong"
+      ) : loading ? (
+        "Loading..."
+      ) : (
+        comments.map((comment) => (
+          <div className="comment" key={comment.id}>
+            <img src={"/upload/" + comment.profilePic} alt="" />
+            <div className="info">
+              <span>{comment.name}</span>
+              <p>{comment.desc}</p>
+            </div>
+            <span className="date">{moment(comment.createdAt).fromNow()}</span>
           </div>
-          <span className="date">{moment(comment.createdAt).fromNow()}</span>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
 };
