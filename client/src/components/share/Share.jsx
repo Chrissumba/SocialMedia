@@ -1,16 +1,8 @@
-import React, { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  setFile,
-  setDesc,
-  createPost,
-  selectFile,
-  selectDesc,
-  selectLoading,
-  selectError,
-} from "../../redux/slices/shareSlice";
+import { setFile, setDesc, createPost, selectFile, selectDesc, selectLoading, selectError } from "../../redux/slices/shareSlice";
 import { AuthContext } from "../../context/authContext";
-import { useCloudinaryUpload } from "../../cloudinary/useCloudinaryUpload";
+
 import Image from "../../assets/Image.png";
 import Map from "../../assets/Map.png";
 import Friend from "../../assets/Friend.png";
@@ -23,20 +15,41 @@ const Share = () => {
   const error = useSelector(selectError);
   const dispatch = useDispatch();
   const { currentUser } = useContext(AuthContext);
-  const { uploadImage } = useCloudinaryUpload();
+
+  const [image, setImage] = useState("");
+
+  const uploadImageToCloudinary = async (files) => {
+    const formData = new FormData();
+    formData.append("file", files[0]);
+    formData.append("upload_preset", "<your upload preset>");
+
+    try {
+      const response = await fetch("https://api.cloudinary.com/v1_1/<your cloud name>/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      throw new Error("Failed to upload file.");
+    }
+  };
 
   const handleUpload = async (event) => {
     const file = event.target.files[0];
     dispatch(setFile(file));
+
+    try {
+      const imgUrl = await uploadImageToCloudinary(file);
+      setImage(imgUrl);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleClick = async (e) => {
     e.preventDefault();
-    let imgUrl = "";
-    if (file) {
-      imgUrl = await uploadImage(file);
-    }
-    dispatch(createPost({ desc, img: imgUrl }));
+    dispatch(createPost({ desc, img: image }));
   };
 
   return (
@@ -87,6 +100,14 @@ const Share = () => {
         {loading && <div>Loading...</div>}
         {error && <div>Error: {error}</div>}
       </div>
+
+      {/* Display the uploaded image */}
+      {image && (
+        <img
+          src={image}
+          alt="uploaded image"
+        />
+      )}
     </div>
   );
 };

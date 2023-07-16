@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/slices/authorizationSlice";
 import "./login.scss";
+
 
 const Login = () => {
   const [inputs, setInputs] = useState({
@@ -12,7 +13,7 @@ const Login = () => {
   const [err, setErr] = useState(null);
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.auth.isLoading);
-
+  const navigate= useNavigate(); // Access the history object
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -22,6 +23,7 @@ const Login = () => {
     dispatch(login(inputs))
       .then(() => {
         // Handle successful login
+        navigate("/"); 
       })
       .catch((error) => {
         setErr(error.response.data);

@@ -1,30 +1,41 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { uploadImageToCloudinary } from "../../utils/cloudinaryUtils";
-import { makeRequest } from "../../axios";
+import axios from "axios"; // Import Axios
 
-export const uploadFile = createAsyncThunk(
-    "share/uploadFile",
-    async(file) => {
-        try {
-            const uploadedImageUrl = await uploadImageToCloudinary(file);
-            return uploadedImageUrl;
-        } catch (error) {
-            throw new Error("Failed to upload file.");
-        }
-    }
-);
+// Your Cloudinary upload function (similar to the provided example)
+const uploadImageToCloudinary = async(file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "<your upload preset>");
 
-export const createPost = createAsyncThunk(
-    "share/createPost",
-    async({ desc, img }) => {
-        try {
-            const response = await makeRequest.post("http://localhost:3000/addpost", { desc, img });
-            return response.data;
-        } catch (error) {
-            throw new Error("Failed to create post.");
-        }
+    try {
+        const response = await fetch("https://api.cloudinary.com/v1_1/<your cloud name>/image/upload", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+        return data.secure_url;
+    } catch (error) {
+        throw new Error("Failed to upload file.");
     }
-);
+};
+
+export const uploadFile = createAsyncThunk("share/uploadFile", async(file) => {
+    try {
+        const uploadedImageUrl = await uploadImageToCloudinary(file);
+        return uploadedImageUrl;
+    } catch (error) {
+        throw new Error("Failed to upload file.");
+    }
+});
+
+export const createPost = createAsyncThunk("share/createPost", async({ desc, img }) => {
+    try {
+        const response = await axios.post("http://localhost:3000/addpost", { desc, img }); // Use axios.post instead of makeRequest.post
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to create post.");
+    }
+});
 
 const shareSlice = createSlice({
     name: "share",
@@ -50,7 +61,7 @@ const shareSlice = createSlice({
             })
             .addCase(uploadFile.fulfilled, (state, action) => {
                 state.loading = false;
-                state.fileUrl = action.payload;
+                state.fileUrl = action.payload; // Update the state with the uploaded image URL
             })
             .addCase(uploadFile.rejected, (state, action) => {
                 state.loading = false;

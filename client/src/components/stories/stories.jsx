@@ -1,7 +1,7 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchStories, selectStories, selectLoading, selectError, addStory } from "../../redux/slices/storiesSlice";
-import { useCloudinaryUpload } from "../../cloudinary/useCloudinaryUpload";
+
 import { AuthContext } from "../../context/authContext";
 import "./stories.scss";
 
@@ -11,22 +11,42 @@ const Stories = () => {
   const error = useSelector(selectError);
   const dispatch = useDispatch();
   const { currentUser } = useContext(AuthContext);
-  const { uploadImage } = useCloudinaryUpload();
+
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     dispatch(fetchStories());
   }, [dispatch]);
 
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "<your upload preset>");
+
+    try {
+      const response = await fetch("https://api.cloudinary.com/v1_1/<your cloud name>/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      throw new Error("Failed to upload file.");
+    }
+  };
+
   const handleUpload = async (event) => {
     const file = event.target.files[0];
+    setImage(file);
 
-    // Upload the file to Cloudinary
-    const result = await uploadImage(file);
+    try {
+      const imgUrl = await uploadImageToCloudinary(file);
 
-    if (result && result.url) {
       // Dispatch an action to add the story with the uploaded image URL
-      // You can replace "name" with any other relevant property for the story
-      dispatch(addStory({ url: result.url, name: "My Story" }));
+      // You can replace "My Story" with any other relevant property for the story
+      dispatch(addStory({ url: imgUrl, name: "My Story" }));
+    } catch (error) {
+      console.error(error);
     }
   };
 

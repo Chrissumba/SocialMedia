@@ -1,16 +1,40 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { makeRequest } from "../../axios";
+import axios from "axios"; // Import Axios
 
-// Async Thunk for fetching stories
+// Your Cloudinary upload function (similar to the provided example)
+const uploadImageToCloudinary = async(file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "<your upload preset>");
+
+    try {
+        const response = await fetch("https://api.cloudinary.com/v1_1/<your cloud name>/image/upload", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+        return data.secure_url;
+    } catch (error) {
+        throw new Error("Failed to upload file.");
+    }
+};
+
 export const fetchStories = createAsyncThunk("stories/fetchStories", async() => {
-    const response = await makeRequest.get("http://localhost:3000/getstory");
-    return response.data;
+    try {
+        const response = await axios.get("http://localhost:3000/getstory");
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to fetch stories.");
+    }
 });
 
-// Async Thunk for adding a story
 export const addStory = createAsyncThunk("stories/addStory", async(newStory) => {
-    const response = await makeRequest.post("http://localhost:3000/addstory", newStory);
-    return response.data;
+    try {
+        const response = await axios.post("http://localhost:3000/addstory", newStory);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to add story.");
+    }
 });
 
 const storiesSlice = createSlice({

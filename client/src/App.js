@@ -7,26 +7,26 @@ import {
     Navigate,
 } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
-import LeftBar from "./components/leftBar/LeftBar";
-import RightBar from "./components/rightBar/RightBar";
-import Home from "./pages/home/Home";
+import LeftBar from "./components/leftbar/LeftBar"
+import RightBar from "./components/rightbar/RightBar";
+import Home from "./pages/home/Home"
 import Profile from "./pages/profile/Profile";
 import "./style.scss";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 
 function App() {
     const { currentUser } = useContext(AuthContext);
 
     const { darkMode } = useContext(DarkModeContext);
 
-    const queryClient = new QueryClient();
+
 
     const Layout = () => {
-        return ( <
-            QueryClientProvider client = { queryClient } >
+        return (
+
             <
             div className = { `theme-${darkMode ? "dark" : "light"}` } >
             <
@@ -46,8 +46,8 @@ function App() {
             RightBar / >
             <
             /div> <
-            /div> <
-            /QueryClientProvider>
+            /div>
+
         );
     };
 
