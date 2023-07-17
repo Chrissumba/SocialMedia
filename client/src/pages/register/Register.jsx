@@ -36,11 +36,9 @@ const Register = () => {
     <div className="register">
       <div className="card">
         <div className="left">
-          <h1>Lama Social.</h1>
+          <h1>Inbound media.</h1>
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero cum,
-            alias totam numquam ipsa exercitationem dignissimos, error nam,
-            consequatur.
+          Whether you're here to catch up with friends, share your experiences, or discover exciting content, we hope you have a fantastic time. Remember, this platform is all about connecting with others, spreading positivity, and engaging in meaningful discussions.
           </p>
           <span>Do you have an account?</span>
           <Link to="/login">

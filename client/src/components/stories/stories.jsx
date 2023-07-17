@@ -1,7 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchStories, selectStories, selectLoading, selectError, addStory } from "../../redux/slices/storiesSlice";
-
 import { AuthContext } from "../../context/authContext";
 import "./stories.scss";
 
@@ -52,11 +51,13 @@ const Stories = () => {
 
   return (
     <div className="stories">
-      <div className="story">
-        <input type="file" accept="image/*" onChange={handleUpload} />
-        <span>{currentUser.name}</span>
-        <button>+</button>
-      </div>
+      {currentUser ? (
+        <div className="story">
+          <input type="file" accept="image/*" onChange={handleUpload} />
+          <span>{currentUser.name}</span>
+          <button>+</button>
+        </div>
+      ) : null}
       {error ? (
         <div className="error">Something went wrong</div>
       ) : loading ? (

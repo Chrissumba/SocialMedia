@@ -15,7 +15,7 @@ import "./style.scss";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
-
+import { useSelector } from "react-redux";
 
 function App() {
     const { currentUser } = useContext(AuthContext);
@@ -51,23 +51,29 @@ function App() {
         );
     };
 
-    const ProtectedRoute = ({ children }) => {
-        if (!currentUser) {
-            return <Navigate to = "/login" / > ;
-        }
+    // const ProtectedRoute = ({ children }) => {
+    //   if (!currentUser) {
+    //     return <Navigate to="/login" />;
+    //   }
 
-        return children;
+    //   return children;
+    // };
+    const ProtectedRoute = ({ element: Element, ...rest }) => {
+        const token = useSelector((state) => state.auth.token);
+
+        return token ? < Element {...rest }
+        /> : <Navigate to="/login
+        " />;
     };
 
+
     const router = createBrowserRouter([{
-            path: "/",
-            element: ( <
-                ProtectedRoute >
-                <
-                Layout / >
-                <
-                /ProtectedRoute>
-            ),
+            // path: "/",
+            // element: (
+            //   <ProtectedRoute>
+            //     <Home />
+            //   </ProtectedRoute>
+            // ),
             children: [{
                     path: "/",
                     element: < Home / > ,

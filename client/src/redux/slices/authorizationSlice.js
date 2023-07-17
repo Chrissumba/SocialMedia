@@ -7,14 +7,18 @@ export const login = createAsyncThunk(
     async(credentials, { rejectWithValue }) => {
         try {
             const response = await axios.post("http://localhost:3000/login", credentials, { withCredentials: true });
-            // Assuming the API returns a token upon successful login
-            return response.data.token;
+            console.log("Login Response Data:", response.data);
+            const token = response.data.token;
+            console.log("Token Value:", token);
+            localStorage.setItem('auth', JSON.stringify(token));
+            return token;
         } catch (error) {
-            // Handle error and return the error response
+            console.log("Login Error:", error);
             return rejectWithValue(error.response.data);
         }
     }
 );
+
 
 // Async Thunk for registration action
 export const register = createAsyncThunk(
@@ -54,6 +58,7 @@ const authSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.token = action.payload;
+                console.log("Token after login:", action.payload);
             })
             .addCase(login.rejected, (state, action) => {
                 state.isLoading = false;

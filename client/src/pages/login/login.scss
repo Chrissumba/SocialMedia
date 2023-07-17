@@ -1,11 +1,13 @@
 .login {
-    height: 100vh;
     background-color: rgb(193, 190, 255);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px;
+    height: 100vh;
+    overflow-y: auto;
     .card {
-        width: 50%;
+        width: 90%;
         display: flex;
         background-color: white;
         border-radius: 10px;

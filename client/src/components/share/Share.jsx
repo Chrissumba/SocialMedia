@@ -10,7 +10,7 @@ import "./share.scss";
 
 const Share = () => {
   const file = useSelector(selectFile);
-  const desc = useSelector(selectDesc);
+  const description = useSelector(selectDesc);
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
   const dispatch = useDispatch();
@@ -49,21 +49,24 @@ const Share = () => {
 
   const handleClick = async (e) => {
     e.preventDefault();
-    dispatch(createPost({ desc, img: image }));
+    dispatch(createPost({ description, img: image }));
   };
 
   return (
     <div className="share">
-      <div className="container">
-        <div className="top">
-          <div className="left">
+    <div className="container">
+      <div className="top">
+        <div className="left">
+          {/* {currentUser.profilePic ? (
             <img src={"/upload/" + currentUser.profilePic} alt="" />
-            <input
-              type="text"
-              placeholder={`What's on your mind ${currentUser.name}?`}
-              onChange={(e) => dispatch(setDesc(e.target.value))}
-              value={desc}
-            />
+          ) : null} */}
+          <input
+            type="text"
+           // placeholder={`Make a post ${currentUser.name}?`}
+           placeholder="make a post"
+            onChange={(e) => dispatch(setDesc(e.target.value))}
+            value={description}
+          />
           </div>
           <div className="right">
             {file && <img className="file" alt="" src={URL.createObjectURL(file)} />}

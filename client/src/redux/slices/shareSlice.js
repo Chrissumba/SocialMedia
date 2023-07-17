@@ -28,9 +28,9 @@ export const uploadFile = createAsyncThunk("share/uploadFile", async(file) => {
     }
 });
 
-export const createPost = createAsyncThunk("share/createPost", async({ desc, img }) => {
+export const createPost = createAsyncThunk("share/createPost", async({ description, img }) => {
     try {
-        const response = await axios.post("http://localhost:3000/addpost", { desc, img }); // Use axios.post instead of makeRequest.post
+        const response = await axios.post("http://localhost:3000/addpost", { description, img }); // Use axios.post instead of makeRequest.post
         return response.data;
     } catch (error) {
         throw new Error("Failed to create post.");
@@ -87,7 +87,7 @@ const shareSlice = createSlice({
 export const { setFile, setDesc } = shareSlice.actions;
 
 export const selectFile = (state) => state.share.file;
-export const selectDesc = (state) => state.share.desc;
+export const selectDesc = (state) => state.share.description;
 export const selectLoading = (state) => state.share.loading;
 export const selectError = (state) => state.share.error;
 
