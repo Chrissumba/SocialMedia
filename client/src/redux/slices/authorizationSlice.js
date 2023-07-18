@@ -10,7 +10,7 @@ export const login = createAsyncThunk(
             console.log("Login Response Data:", response.data);
             const token = response.data.token;
             console.log("Token Value:", token);
-            localStorage.setItem('auth', JSON.stringify(token));
+            //  localStorage.setItem('auth', JSON.stringify(token));
             return token;
         } catch (error) {
             console.log("Login Error:", error);

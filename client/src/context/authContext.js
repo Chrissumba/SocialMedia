@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useMemo, useState } from "react";
 
 export const AuthContext = createContext();
 
@@ -16,9 +16,12 @@ export const AuthContextProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(currentUser));
     }, [currentUser]);
 
+    const authContextValue = useMemo(() => ({ currentUser, login }), [
+        currentUser,
+    ]);
+
     return ( <
-        AuthContext.Provider value = {
-            { currentUser, login } } > { children } <
+        AuthContext.Provider value = { authContextValue } > { children } <
         /AuthContext.Provider>
     );
 };

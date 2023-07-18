@@ -23,13 +23,13 @@ const LeftBar = () => {
     <div className="leftBar">
       <div className="container">
         <div className="menu">
-          <div className="user">
+          {/* <div className="user">
             <img
               src={"/upload/" +currentUser.profilePic}
               alt=""
             />
             <span>{currentUser.name}</span>
-          </div>
+          </div> */}
           <div className="item">
             <img src={Friends} alt="" />
             <span>Friends</span>

@@ -1,6 +1,7 @@
-import Share from "../../components/share/Share"
-import Stories from "../../components/stories/stories"
-import Posts from "../../components/posts/posts"
+import Share from "../../components/share/Share";
+import Stories from "../../components/stories/stories";
+import Posts from "../../components/posts/posts";
+ 
 import "./home.scss"
 
 const Home = () => {
@@ -9,6 +10,7 @@ const Home = () => {
       <Stories/>
       <Share/>
       <Posts/>
+      
     </div>
   )
 }

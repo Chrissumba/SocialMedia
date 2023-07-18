@@ -25,7 +25,7 @@ const RightBar = () => {
                 src="https://images.pexels.com/photos/4881619/pexels-photo-4881619.jpeg?auto=compress&cs=tinysrgb&w=1600"
                 alt=""
               />
-              <span>Chris Sumba</span>
+              <span>Jane Doe</span>
             </div>
             <div className="buttons">
               <button>follow</button>
@@ -42,7 +42,7 @@ const RightBar = () => {
                 alt=""
               />
               <p>
-                <span>Lavender Mugera</span> changed their cover picture
+                <span>Chris</span> changed their cover picture
               </p>
             </div>
             <span>1 min ago</span>
@@ -54,7 +54,7 @@ const RightBar = () => {
                 alt=""
               />
               <p>
-                <span>Lionel Messi</span> changed their cover picture
+                <span>Clare Chege</span> changed their cover picture
               </p>
             </div>
             <span>1 min ago</span>
@@ -66,7 +66,7 @@ const RightBar = () => {
                 alt=""
               />
               <p>
-                <span>Erling Halland</span> changed their cover picture
+                <span>Jane Doe</span> changed their cover picture
               </p>
             </div>
             <span>1 min ago</span>
@@ -93,7 +93,7 @@ const RightBar = () => {
                 alt=""
               />
               <div className="online" />
-              <span>Kylian Mbappe</span>
+              <span>Jane Doe</span>
             </div>
           </div>
           <div className="user">
