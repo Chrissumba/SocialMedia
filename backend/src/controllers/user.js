@@ -77,9 +77,10 @@ async function updateUser(req, res) {
             const pool = await mssql.connect(config);
             const request = pool.request();
             for (const param in values) {
-                if (param === 'password') {
+                if (param === "password") {
                     // Hash the password before storing it in the database
-                    const hashedPassword = bcrypt.hashSync(values[param], 10);
+                    const saltRounds = 10;
+                    const hashedPassword = await bcrypt.hash(values[param], saltRounds);
                     request.input(param, mssql.NVarChar, hashedPassword);
                 } else {
                     request.input(param, values[param]);
@@ -92,12 +93,11 @@ async function updateUser(req, res) {
                 return res.status(404).json("User not found");
             }
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error("An error occurred:", error);
             return res.status(500).json(error);
         }
     });
 }
-
 async function getUserByName(req, res) {
     try {
         const token = req.session.accessToken;

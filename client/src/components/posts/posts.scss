@@ -1,5 +1,11 @@
+// .posts {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 50px;
+// }
 .posts {
     display: flex;
     flex-direction: column;
     gap: 50px;
+    margin-bottom: -30px; // Reduce the gap between stories and posts
 }

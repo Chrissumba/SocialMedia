@@ -4,7 +4,8 @@ const { user } = require('../config/config')
 const config = require('../config/config')
 const moment = require('moment')
 require('dotenv').config()
-
+    // req.session.authorized = true;
+    // req.session.user = user;
 async function getPosts(req, res) {
     const userId = req.query.userId;
     const token = req.session.accessToken;
@@ -15,19 +16,26 @@ async function getPosts(req, res) {
         const pool = await mssql.connect(config);
 
         const q = `
-            SELECT p.*, u.id AS userId, u.name, u.profilePic
-            FROM Posts AS p
-            JOIN Users AS u ON u.id = p.userId
-            JOIN Follow AS f ON f.followedUserId = p.userId
-            WHERE f.followerUserId = @userId
-            ORDER BY p.createdAt DESC
-        `;
+      SELECT DISTINCT p.*, u.id AS userId, u.name, u.profilePic
+      FROM posts AS p
+      JOIN users AS u ON u.id = p.userId
+      LEFT JOIN Follow AS r ON p.userId = r.followedUserId
+      WHERE r.followerUserId = @userId OR p.userId = @userId
+      ORDER BY p.createdAt DESC;
+    `;
 
         const request = pool.request();
         request.input("userId", mssql.Int, userId || userInfo.id);
 
         const result = await request.query(q);
-        return res.status(200).json(result.recordset);
+
+        // Process the result to ensure userId is a single value, not an array
+        const processedResult = result.recordset.map((post) => ({
+            ...post,
+            userId: Array.isArray(post.userId) ? post.userId[0] : post.userId,
+        }));
+
+        return res.status(200).json(processedResult);
     } catch (error) {
         return res.status(500).json(error);
     }

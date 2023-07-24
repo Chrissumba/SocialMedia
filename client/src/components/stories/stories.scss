@@ -1,65 +1,95 @@
 @import "../../style.scss";
 .stories {
     display: flex;
-    gap: 10px;
-    height: 250px;
+    flex-direction: column;
     margin-bottom: 30px;
-    @include mobile {
-        height: 50px;
-        margin-bottom: 0;
-        justify-content: space-between;
-    }
-    @include tablet {
-        height: 150px;
-        gap: 20px;
+    .stories-container {
+        display: flex;
+        gap: 10px;
+        height: 250px;
+        @include mobile {
+            height: 50px;
+        }
+        @include tablet {
+            height: 150px;
+            gap: 20px;
+        }
     }
     .story {
-        flex: 1;
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .story-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            @include mobile {
+                width: 40px;
+                height: 40px;
+            }
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+        span {
+            color: white;
+            font-weight: 500;
+        }
+    }
+    .add-story {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
         @include mobile {
             flex: none;
             width: 50px;
             height: 50px;
-            border-radius: 50%;
         }
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        span {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            color: white;
-            font-weight: 500;
-            @include mobile {
-                display: none;
-            }
-        }
-        button {
-            position: absolute;
-            bottom: 40px;
-            left: 10px;
-            color: white;
-            background-color: #5271ff;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-size: 30px;
+        .bottom-left {
             display: flex;
             align-items: center;
-            justify-content: center;
-            @include mobile {
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
+            gap: 5px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            button {
+                color: white;
+                background-color: #5271ff;
+                border: none;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                cursor: pointer;
+                font-size: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                @include mobile {
+                    margin: auto;
+                }
+            }
+            span {
+                color: white;
+                font-weight: 500;
+            }
+        }
+        .bottom-right {
+            button {
+                color: white;
+                background-color: #5271ff;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 16px;
+                cursor: pointer;
             }
         }
     }

@@ -51,26 +51,26 @@ const storiesSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchStories.fulfilled, (state, action) => {
-                state.loading = false;
-                state.stories = action.payload;
-            })
-            .addCase(fetchStories.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-            .addCase(addStory.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(addStory.fulfilled, (state, action) => {
-                state.loading = false;
-                state.stories.push(action.payload);
-            })
-            .addCase(addStory.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            });
+        builder.addCase(fetchStories.fulfilled, (state, action) => {
+            state.loading = false;
+            state.stories = action.payload;
+        })
+        builder.addCase(fetchStories.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        })
+        builder.addCase(addStory.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        builder.addCase(addStory.fulfilled, (state, action) => {
+            state.loading = false;
+            state.stories.push(action.payload);
+        })
+        builder.addCase(addStory.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        });
     },
 });
 

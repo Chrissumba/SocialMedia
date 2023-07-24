@@ -1,3 +1,5 @@
+/* navbar.scss */
+
 @import "../../style.scss";
 .navbar {
     @include themify($themes) {
@@ -39,6 +41,10 @@
                     @include tablet {
                         width: 200px;
                     }
+                    &:focus {
+                        outline: none;
+                        box-shadow: none;
+                    }
                 }
             }
         }
@@ -54,8 +60,54 @@
                 align-items: center;
                 gap: 10px;
                 font-weight: 500;
-                @include tablet {
-                    display: none;
+                img {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+                span {}
+            }
+        }
+        /* New CSS for search results */
+        .search-results {
+            position: absolute;
+            top: calc(100% + 10px);
+            /* Move to the bottom of the search bar with some spacing */
+            left: 50%;
+            /* Move to the center horizontally */
+            transform: translateX(-50%);
+            /* Adjust position to center horizontally */
+            width: 300px;
+            /* Set the width of the search results container */
+            max-height: 300px;
+            /* Set a maximum height to make it scrollable if needed */
+            overflow-y: auto;
+            /* Enable vertical scrolling if the content exceeds the max-height */
+            background-color: themed("searchResultBg");
+            /* Background color for the search results container */
+            border-radius: 5px;
+            padding: 10px;
+            z-index: 9999;
+            /* Increase z-index to ensure search results appear above other elements */
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            /* Additional styling for individual search results */
+            li {
+                margin-bottom: 5px;
+                cursor: pointer;
+                padding: 10px;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 500;
+                transition: background-color 0.2s ease;
+                &:hover {
+                    background-color: themed("searchResultBgHover");
                 }
                 img {
                     width: 30px;

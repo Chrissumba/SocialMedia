@@ -111,7 +111,16 @@ async function login(req, res) {
         const { password: hashedPassword, ...userData } = user;
 
         req.session.accessToken = token; // Store the token in the session
+        // req.session.authorized = true;
+        //         req.session.user = user;
 
+
+        // res.status(200).json(userData);
+        res.cookie("accessToken", token, {
+            httpOnly: true,
+        });
+
+        // Send the response with the user data (others) and the access token as a cookie
         res.status(200).json(userData);
     } catch (error) {
         res.status(500).send({

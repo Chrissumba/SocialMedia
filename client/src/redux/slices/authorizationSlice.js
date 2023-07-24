@@ -7,11 +7,10 @@ export const login = createAsyncThunk(
     async(credentials, { rejectWithValue }) => {
         try {
             const response = await axios.post("http://localhost:3000/login", credentials, { withCredentials: true });
-            console.log("Login Response Data:", response.data);
-            const token = response.data.token;
-            console.log("Token Value:", token);
+
+            const { data } = response
             //  localStorage.setItem('auth', JSON.stringify(token));
-            return token;
+            return data;
         } catch (error) {
             console.log("Login Error:", error);
             return rejectWithValue(error.response.data);
@@ -39,7 +38,7 @@ export const register = createAsyncThunk(
 const authSlice = createSlice({
     name: "auth",
     initialState: {
-        token: null,
+        user: null,
         error: null,
         isLoading: false,
     },
@@ -52,30 +51,32 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(login.pending, (state) => {
+
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(login.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.token = action.payload;
-                console.log("Token after login:", action.payload);
-            })
-            .addCase(login.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload;
-            })
-            .addCase(register.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(register.fulfilled, (state, action) => {
-                state.isLoading = false;
-                // Handle successful registration if needed
-            })
-            .addCase(register.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload;
-            });
+        builder.addCase(login.fulfilled, (state, action) => {
+            console.log(action.payload)
+            state.isLoading = false;
+            state.error = null;
+            state.user = action.payload;
+        })
+        builder.addCase(login.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload;
+        })
+        builder.addCase(register.pending, (state) => {
+            state.isLoading = true;
+            state.error = null;
+        })
+        builder.addCase(register.fulfilled, (state, action) => {
+            state.isLoading = false;
+            // Handle successful registration if needed
+        })
+        builder.addCase(register.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload;
+        });
     },
 });
 

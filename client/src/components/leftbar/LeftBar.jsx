@@ -1,99 +1,96 @@
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./leftbar.scss";
 import Friends from "../../assets/1.png";
-import Groups from "../../assets/2.png";
-import Market from "../../assets/3.png";
-import Watch from "../../assets/4.png";
-import Memories from "../../assets/5.png";
-import Events from "../../assets/6.png";
-import Gaming from "../../assets/7.png";
-import Gallery from "../../assets/8.png";
-import Videos from "../../assets/9.png";
-import Messages from "../../assets/10.png";
-import Tutorials from "../../assets/11.png";
-import Courses from "../../assets/12.png";
-import Fund from "../../assets/13.png";
+import EventsIcon from "@mui/icons-material/Event";
+import GalleryIcon from "@mui/icons-material/PhotoLibrary";
+import TutorialsIcon from "@mui/icons-material/MenuBook";
+import CoursesIcon from "@mui/icons-material/School";
 import { AuthContext } from "../../context/authContext";
-import { useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
+import FriendsModal from "./friendsModal";
 
 const LeftBar = () => {
-
   const { currentUser } = useContext(AuthContext);
+  const userId = currentUser.id;
+  const navigate = useNavigate();
+
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [friendsList, setFriendsList] = useState([]);
+
+  // Fetch followers data
+  const { isLoading: followersLoading, data: followersData } = useQuery(
+    ["followers"],
+    () => makeRequest.get(`/getfollow/${userId}`).then((res) => res.data)
+  );
+
+  // Fetch following data
+  const { isLoading: followingLoading, data: followingData } = useQuery(
+    ["following"],
+    () => makeRequest.get(`/followedusers/${userId}`).then((res) => res.data)
+  );
+
+  // Combine the followers and following data to create a list of friends
+  const friends = [
+    ...(followersData || []),
+    ...(followingData || []),
+  ];
+
+  const handleFriendsClick = () => {
+    setFriendsList(friends);
+    setShowFriendsModal(true);
+  };
 
   return (
     <div className="leftBar">
       <div className="container">
         <div className="menu">
-          {/* <div className="user">
-            <img
-              src={"/upload/" +currentUser.profilePic}
-              alt=""
-            />
+          <div className="user">
+            <img src={"/upload/" + currentUser.profilePic} alt="" />
             <span>{currentUser.name}</span>
-          </div> */}
-          <div className="item">
+          </div>
+          <div className="item" onClick={handleFriendsClick}>
             <img src={Friends} alt="" />
             <span>Friends</span>
-          </div>
-          <div className="item">
-            <img src={Groups} alt="" />
-            <span>Groups</span>
-          </div>
-          <div className="item">
-            <img src={Market} alt="" />
-            <span>Marketplace</span>
-          </div>
-          <div className="item">
-            <img src={Watch} alt="" />
-            <span>Watch</span>
-          </div>
-          <div className="item">
-            <img src={Memories} alt="" />
-            <span>Memories</span>
           </div>
         </div>
         <hr />
         <div className="menu">
           <span>Your shortcuts</span>
           <div className="item">
-            <img src={Events} alt="" />
+            <EventsIcon />
             <span>Events</span>
           </div>
           <div className="item">
-            <img src={Gaming} alt="" />
-            <span>Gaming</span>
-          </div>
-          <div className="item">
-            <img src={Gallery} alt="" />
+            <GalleryIcon />
             <span>Gallery</span>
           </div>
           <div className="item">
-            <img src={Videos} alt="" />
-            <span>Videos</span>
-          </div>
-          <div className="item">
-            <img src={Messages} alt="" />
-            <span>Messages</span>
+            <TutorialsIcon />
+            <span>Tutorials</span>
           </div>
         </div>
         <hr />
         <div className="menu">
           <span>Others</span>
           <div className="item">
-            <img src={Fund} alt="" />
-            <span>Fundraiser</span>
-          </div>
-          <div className="item">
-            <img src={Tutorials} alt="" />
-            <span>Tutorials</span>
-          </div>
-          <div className="item">
-            <img src={Courses} alt="" />
+            <CoursesIcon />
             <span>Courses</span>
           </div>
         </div>
       </div>
-    </div>
-  );
+
+      {/* Show the friends modal when showFriendsModal is true */}
+      {showFriendsModal && (
+      <FriendsModal
+        onClose={() => setShowFriendsModal(false)}
+        friends={friendsList}
+        title="Your Friends" // Provide the title prop here
+      />
+    )}
+  </div>
+);
 };
 
 export default LeftBar;

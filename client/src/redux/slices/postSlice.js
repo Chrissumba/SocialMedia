@@ -63,38 +63,38 @@ const postSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchLikes.fulfilled, (state, action) => {
-                state.loading = false;
-                const { postId, likes } = action.payload;
-                const post = state.posts.find((p) => p.id === postId);
-                if (post) {
-                    post.likes = likes;
-                }
-            })
-            .addCase(fetchLikes.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-            .addCase(addLike.fulfilled, (state, action) => {
-                const postId = action.payload;
-                const post = state.posts.find((p) => p.id === postId);
-                if (post) {
-                    post.likes += 1;
-                }
-            })
-            .addCase(deletePost.fulfilled, (state, action) => {
-                const postId = action.payload;
-                state.posts = state.posts.filter((p) => p.id !== postId);
-            })
-            .addCase(deleteLike.fulfilled, (state, action) => {
-                const { postId, likeId } = action.payload;
-                const post = state.posts.find((p) => p.id === postId);
-                if (post) {
-                    post.likes -= 1;
-                    post.likes = post.likes < 0 ? 0 : post.likes;
-                    post.likes = post.likes.filter((l) => l.id !== likeId);
-                }
-            });
+        builder.addCase(fetchLikes.fulfilled, (state, action) => {
+            state.loading = false;
+            const { postId, likes } = action.payload;
+            const post = state.posts.find((p) => p.id === postId);
+            if (post) {
+                post.likes = likes;
+            }
+        })
+        builder.addCase(fetchLikes.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        })
+        builder.addCase(addLike.fulfilled, (state, action) => {
+            const postId = action.payload;
+            const post = state.posts.find((p) => p.id === postId);
+            if (post) {
+                post.likes += 1;
+            }
+        })
+        builder.addCase(deletePost.fulfilled, (state, action) => {
+            const postId = action.payload;
+            state.posts = state.posts.filter((p) => p.id !== postId);
+        })
+        builder.addCase(deleteLike.fulfilled, (state, action) => {
+            const { postId, likeId } = action.payload;
+            const post = state.posts.find((p) => p.id === postId);
+            if (post) {
+                post.likes -= 1;
+                post.likes = post.likes < 0 ? 0 : post.likes;
+                post.likes = post.likes.filter((l) => l.id !== likeId);
+            }
+        });
     },
 });
 

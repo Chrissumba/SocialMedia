@@ -1,72 +1,70 @@
-import React, { useState, useContext } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { setFile, setDesc, createPost, selectFile, selectDesc, selectLoading, selectError } from "../../redux/slices/shareSlice";
-import { AuthContext } from "../../context/authContext";
-
+import React, { useContext, useState } from "react";
+import "./share.scss";
 import Image from "../../assets/Image.png";
 import Map from "../../assets/Map.png";
 import Friend from "../../assets/Friend.png";
-import "./share.scss";
+import { AuthContext } from "../../context/authContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
 
 const Share = () => {
-  const file = useSelector(selectFile);
-  const description = useSelector(selectDesc);
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
-  const dispatch = useDispatch();
+  const [file, setFile] = useState(null);
+  const [description, setDescription] = useState("");
   const { currentUser } = useContext(AuthContext);
+  const queryClient = useQueryClient();
 
-  const [image, setImage] = useState("");
+  const generateUniqueFileName = (file) => {
+    const randomString = Math.random().toString(36).substring(7);
+    const fileExtension = file.name.split(".").pop();
+    const newFileName = `${Date.now()}-${randomString}.${fileExtension}`;
+    return new File([file], newFileName, { type: file.type });
+  };
 
-  const uploadImageToCloudinary = async (files) => {
-    const formData = new FormData();
-    formData.append("file", files[0]);
-    formData.append("upload_preset", "<your upload preset>");
-
+  const upload = async () => {
     try {
-      const response = await fetch("https://api.cloudinary.com/v1_1/<your cloud name>/image/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      return data.secure_url;
-    } catch (error) {
-      throw new Error("Failed to upload file.");
+      if (!file) return null;
+      const updatedFile = generateUniqueFileName(file);
+      const formData = new FormData();
+      formData.append("file", updatedFile);
+      const res = await makeRequest.post("/upload", formData);
+      return res.data;
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  const handleUpload = async (event) => {
-    const file = event.target.files[0];
-    dispatch(setFile(file));
-
-    try {
-      const imgUrl = await uploadImageToCloudinary(file);
-      setImage(imgUrl);
-    } catch (error) {
-      console.error(error);
+  const mutation = useMutation(
+    (newPost) => {
+      return makeRequest.post("/addpost", newPost);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["posts"]);
+      },
     }
-  };
+  );
 
   const handleClick = async (e) => {
     e.preventDefault();
-    dispatch(createPost({ description, img: image }));
+    const imgUrl = await upload();
+    mutation.mutate({ description, img: imgUrl });
+    setDescription("");
+    setFile(null);
   };
 
   return (
     <div className="share">
-    <div className="container">
-      <div className="top">
-        <div className="left">
-          {/* {currentUser.profilePic ? (
+      <div className="container">
+        <div className="top">
+          <div className="left">
             <img src={"/upload/" + currentUser.profilePic} alt="" />
-          ) : null} */}
-          <input
-            type="text"
-           // placeholder={`Make a post ${currentUser.name}?`}
-           placeholder="make a post"
-            onChange={(e) => dispatch(setDesc(e.target.value))}
-            value={description}
-          />
+            <input
+              type="text"
+              placeholder={`What's on your mind ${currentUser.name}?`}
+              onChange={(e) => setDescription(e.target.value)}
+              value={description}
+            />
           </div>
           <div className="right">
             {file && <img className="file" alt="" src={URL.createObjectURL(file)} />}
@@ -78,8 +76,9 @@ const Share = () => {
             <input
               type="file"
               id="file"
+              name="file"
               style={{ display: "none" }}
-              onChange={handleUpload}
+              onChange={(e) => setFile(e.target.files[0])}
             />
             <label htmlFor="file">
               <div className="item">
@@ -100,17 +99,7 @@ const Share = () => {
             <button onClick={handleClick}>Share</button>
           </div>
         </div>
-        {loading && <div>Loading...</div>}
-        {error && <div>Error: {error}</div>}
       </div>
-
-      {/* Display the uploaded image */}
-      {image && (
-        <img
-          src={image}
-          alt="uploaded image"
-        />
-      )}
     </div>
   );
 };

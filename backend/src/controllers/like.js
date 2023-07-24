@@ -19,7 +19,8 @@ async function getLikes(req, res) {
         request.input('postId', mssql.Int, postId);
 
         const result = await request.query(query);
-        const likes = result.recordset;
+
+        const likes = result.recordset.map((row) => [row.userId]);
 
         if (likes.length === 0) {
             return res.status(200).json({ message: 'No likes found for the specified post.' });
@@ -31,6 +32,7 @@ async function getLikes(req, res) {
         return res.status(500).json({ error: error.message });
     }
 }
+
 
 
 async function addLike(req, res) {
@@ -57,9 +59,9 @@ async function addLike(req, res) {
             const checkPostResult = await checkPostRequest.query(checkPostQuery);
             const postUserId = checkPostResult.recordset[0].userId;
 
-            if (userId === postUserId) {
-                return res.status(400).json('Cannot like your own post.');
-            }
+            // if (userId === postUserId) {
+            //     return res.status(400).json('Cannot like your own post.');
+            // }
 
             // Check if the user has already liked the post
             const checkLikeQuery = `

@@ -41,26 +41,26 @@ const commentsSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchComments.fulfilled, (state, action) => {
-                state.loading = false;
-                state.comments = action.payload;
-            })
-            .addCase(fetchComments.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-            .addCase(addComment.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(addComment.fulfilled, (state, action) => {
-                state.loading = false;
-                state.comments.push(action.payload);
-            })
-            .addCase(addComment.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            });
+        builder.addCase(fetchComments.fulfilled, (state, action) => {
+            state.loading = false;
+            state.comments = action.payload;
+        })
+        builder.addCase(fetchComments.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        })
+        builder.addCase(addComment.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        builder.addCase(addComment.fulfilled, (state, action) => {
+            state.loading = false;
+            state.comments.push(action.payload);
+        })
+        builder.addCase(addComment.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        });
     },
 });
 

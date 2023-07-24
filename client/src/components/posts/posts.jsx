@@ -1,29 +1,26 @@
-// Posts.js
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchPosts, selectPosts, selectLoading, selectError } from "../../redux/slices/postsSlice";
+import { useContext } from "react";
 import Post from "../post/post";
 import "./posts.scss";
+import { AuthContext } from "../../context/authContext";
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
 
-const Posts = ({ userId }) => {
-  const dispatch = useDispatch();
-  const posts = useSelector(selectPosts);
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
+const Posts = () => {
+  const { currentUser } = useContext(AuthContext);
 
-  useEffect(() => {
-    dispatch(fetchPosts(userId));
-  }, [dispatch, userId]);
+  const { isLoading, error, data } = useQuery(["posts"], () =>
+    makeRequest.get(`/allposts/${currentUser.id}`).then((res) => {
+      return res.data;
+    })
+  );
 
   return (
     <div className="posts">
-      {error ? (
-        "Something went wrong!"
-      ) : loading ? (
-        "Loading..."
-      ) : (
-        posts.map((post) => <Post post={post} key={post.id} />)
-      )}
+      {error
+        ? "Something went wrong!"
+        : isLoading
+        ? "loading"
+        : data.map((post) => <Post post={post} key={post.id} />)}
     </div>
   );
 };

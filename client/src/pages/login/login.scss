@@ -1,5 +1,5 @@
 .login {
-    background-color: rgb(193, 190, 255);
+    background-color: rgb(59, 89, 152);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -15,7 +15,7 @@
         overflow: hidden;
         .left {
             flex: 1;
-            background: linear-gradient(rgba(39, 11, 96, 0.5), rgba(39, 11, 96, 0.5)), url("https://images.pexels.com/photos/3228727/pexels-photo-3228727.jpeg?auto=compress&cs=tinysrgb&w=1600") center;
+            background: linear-gradient(rgba(39, 11, 96, 0.5), rgba(39, 11, 96, 0.5)), url("../../assets/pexels-dalila-dalprat-2055500.jpg") center;
             background-size: cover;
             padding: 50px;
             display: flex;
@@ -56,14 +56,14 @@
                 gap: 30px;
                 input {
                     border: none;
-                    border-bottom: 1px solid lightgray;
+                    border-bottom: 1px solid blanchedalmond;
                     padding: 20px 10px;
                 }
                 button {
                     width: 50%;
                     padding: 10px;
                     border: none;
-                    background-color: #938eef;
+                    background-color: rgb(189, 8, 28);
                     color: white;
                     font-weight: bold;
                     cursor: pointer;

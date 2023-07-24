@@ -59,28 +59,28 @@ const shareSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(uploadFile.fulfilled, (state, action) => {
-                state.loading = false;
-                state.fileUrl = action.payload; // Update the state with the uploaded image URL
-            })
-            .addCase(uploadFile.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
-            .addCase(createPost.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(createPost.fulfilled, (state, action) => {
-                state.loading = false;
-                state.post = action.payload;
-                state.file = null;
-                state.desc = "";
-            })
-            .addCase(createPost.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            });
+        builder.addCase(uploadFile.fulfilled, (state, action) => {
+            state.loading = false;
+            state.fileUrl = action.payload; // Update the state with the uploaded image URL
+        })
+        builder.addCase(uploadFile.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        })
+        builder.addCase(createPost.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        builder.addCase(createPost.fulfilled, (state, action) => {
+            state.loading = false;
+            state.post = action.payload;
+            state.file = null;
+            state.desc = "";
+        })
+        builder.addCase(createPost.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        });
     },
 });
 
