@@ -10,6 +10,7 @@ import Navbar from "./components/navbar/Navbar";
 import LeftBar from "./components/leftbar/LeftBar";
 import RightBar from "./components/rightbar/RightBar";
 import Home from "./pages/home/Home";
+import Notifications from "./components/notifications/notification";
 import Profile from "./pages/profile/Profile";
 import "./style.scss";
 import { useContext } from "react";
@@ -75,6 +76,10 @@ function App() {
                 {
                     path: "/profile/:id",
                     element: < Profile / > ,
+                },
+                {
+                    path: "/notification",
+                    element: < Notifications / > ,
                 },
             ],
         },

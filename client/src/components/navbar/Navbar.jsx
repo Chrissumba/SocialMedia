@@ -46,7 +46,7 @@ const Navbar = () => {
           <DarkModeOutlinedIcon onClick={toggle} />
         )}
         <div className="search">
-         
+          <SearchOutlinedIcon />
           <input
             type="text"
             placeholder="Search for a user"
@@ -55,7 +55,10 @@ const Navbar = () => {
         </div>
       </div>
       <div className="right">
-        <NotificationsOutlinedIcon />
+        {/* Link to the notifications page */}
+        <Link to="/notification" style={{ textDecoration: "none", color: "inherit" }}>
+          <NotificationsOutlinedIcon />
+        </Link>
         <div className="user">
           {/* Link to the user's profile page */}
           <Link to={`/profile/${currentUser.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
