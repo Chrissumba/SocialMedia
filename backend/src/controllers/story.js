@@ -29,12 +29,13 @@ async function getStories(req, res) {
         const userInfo = await jwt.verify(token, config.secret);
         const pool = await mssql.connect(config);
         const query = `
-        SELECT U.username,U.id, S.img AS storyImage, S.createdAt, U.profilePic
+        SELECT U.username, U.id AS userId, S.id AS storyId, S.img AS storyImage, S.createdAt, U.profilePic
         FROM Users U
         JOIN Follow F ON F.followedUserId = U.id
         JOIN Stories S ON S.userId = U.id
         WHERE F.followerUserId = @followerUserId
         ORDER BY S.createdAt DESC;
+        
         
         `;
         const request = pool.request();

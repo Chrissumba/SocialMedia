@@ -32,7 +32,6 @@ async function getFollow(req, res) {
 }
 
 
-
 async function addFollow(req, res) {
     const token = req.session.accessToken;
     if (!token) return res.status(401).json('Not logged in!');
@@ -42,23 +41,43 @@ async function addFollow(req, res) {
         const followerUserId = userInfo.id;
         const followedUserId = req.body.followedUserId;
 
+        if (!followedUserId || typeof followedUserId !== 'number' || followedUserId <= 0) {
+            return res.status(400).json('Invalid followedUserId.');
+        }
+
         if (followerUserId === followedUserId) {
             return res.status(400).json('Cannot follow yourself.');
         }
 
+        const pool = await mssql.connect(config);
+
+        // Check if the user with followedUserId exists
+        const checkUserQuery = `
+            SELECT COUNT(*) AS count
+            FROM Users
+            WHERE id = @followedUserId;
+        `;
+
+        const checkUserRequest = pool.request();
+        checkUserRequest.input('followedUserId', mssql.Int, followedUserId);
+
+        const checkUserResult = await checkUserRequest.query(checkUserQuery);
+        if (checkUserResult.recordset[0].count === 0) {
+            return res.status(404).json('User with the given followedUserId does not exist.');
+        }
+
         const checkQuery = `
-        SELECT COUNT(*) AS count
-        FROM Follow
-        WHERE followerUserId = @followerUserId
-        AND followedUserId = @followedUserId;
-      `;
+            SELECT COUNT(*) AS count
+            FROM Follow
+            WHERE followerUserId = @followerUserId
+            AND followedUserId = @followedUserId;
+        `;
 
         const insertQuery = `
-        INSERT INTO Follow (followerUserId, followedUserId)
-        VALUES (@followerUserId, @followedUserId);
-      `;
+            INSERT INTO Follow (followerUserId, followedUserId)
+            VALUES (@followerUserId, @followedUserId);
+        `;
 
-        const pool = await mssql.connect(config);
         const checkRequest = pool.request();
         checkRequest.input('followerUserId', mssql.Int, followerUserId);
         checkRequest.input('followedUserId', mssql.Int, followedUserId);
@@ -118,4 +137,4 @@ async function deleteFollow(req, res) {
     }
 }
 
-module.exports = { getFollow, addFollow, deleteFollow };
+module.exports = { getFollow, addFollow, deleteFollow, };

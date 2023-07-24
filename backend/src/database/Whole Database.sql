@@ -70,6 +70,13 @@ CREATE TABLE Notifications(
   FOREIGN KEY (commentId) REFERENCES Comments(id),
   FOREIGN KEY (personId) REFERENCES Users(id) 
 );
+CREATE TABLE Recommendations (
+  id INT PRIMARY KEY IDENTITY(1, 1),
+  userId INT NOT NULL,
+  recommendedUserId INT NOT NULL,
+  createdAt DATETIME NOT NULL DEFAULT GETDATE(),
+  -- Add any other columns related to recommendations if needed
+);
 
 
 DROP TABLE Notifications
