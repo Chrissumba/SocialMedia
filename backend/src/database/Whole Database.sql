@@ -99,3 +99,5 @@ BEGIN
 END;
 
 
+ALTER TABLE Notifications
+ADD isRead BIT NOT NULL DEFAULT 0;

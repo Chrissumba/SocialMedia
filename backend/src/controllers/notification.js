@@ -13,10 +13,12 @@ async function getNotifications(req, res) {
         console.log("Connected to the database");
 
         const q = `
-            SELECT description, sourceid
-            FROM Notifications
-            WHERE userid = @userId
-            ORDER BY created_at DESC;
+        SELECT n.notification_id, n.description, n.sourceid, u.profilePic
+        FROM Notifications AS n
+        JOIN Users AS u ON n.sourceid = u.id
+        WHERE n.userid = @userId
+        ORDER BY n.created_at DESC;
+        
         `;
 
         const request = pool.request();

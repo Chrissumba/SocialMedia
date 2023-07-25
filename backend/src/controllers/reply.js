@@ -12,7 +12,7 @@ async function getReplies(req, res) {
     const pool = await mssql.connect(config);
     try {
         const q = `
-        SELECT U.name, R.description
+        SELECT U.name, R.description , R.createdAt
         FROM Replies R
         JOIN Users U ON U.id = R.personId
         WHERE R.commentId = @commentId
