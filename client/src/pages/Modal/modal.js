@@ -8,6 +8,9 @@ const Modal = ({ onClose, data }) => {
     // Check if data.users is not defined or empty
     const hasUsers = data && data.users && data.users.length > 0;
 
+    // Get the count of users
+    const userCount = data && data.users ? data.users.length : 0;
+
     const handleUserProfileClick = (userId) => {
         // Navigate to the profile page of the clicked user
         navigate(`/profile/${userId}`);
@@ -21,7 +24,8 @@ const Modal = ({ onClose, data }) => {
         onClick = {
             (e) => e.stopPropagation() } >
         <
-        h2 > { data.title } < /h2> {
+        h2 > { data.title }({ userCount }) <
+        /h2> {
             hasUsers ? ( <
                 ul className = "user-list" > {
                     data.users.map((user) => ( <
@@ -32,7 +36,8 @@ const Modal = ({ onClose, data }) => {
                         <
                         img src = { "/upload/" + user.profilePic }
                         alt = { user.name }
-                        className = "user-avatar" / >
+                        className = "user-avatar" /
+                        >
                         <
                         span className = "user-name" > { user.name } < /span> <
                         /li>
@@ -49,27 +54,3 @@ const Modal = ({ onClose, data }) => {
 };
 
 export default Modal;
-
-// import React from "react";
-// import "./modal.scss";
-
-
-// const Modal = ({ onClose, data }) => {
-//   return (
-//     <div className="modal-overlay" onClick={onClose}>
-//       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-//         <h2>{data.title}</h2>
-//         <ul>
-//           {data.users.map((user) => (
-//             <li key={user.id}>
-//               <img src={"/upload/" + user.profilePic} alt={user.name} />
-//               <span>{user.name}</span>
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Modal;

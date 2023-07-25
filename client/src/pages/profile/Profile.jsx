@@ -23,6 +23,7 @@ const Profile = () => {
   const { currentUser } = useContext(AuthContext);
   const [openFollowersModal, setOpenFollowersModal] = useState(false);
   const [openFollowingModal, setOpenFollowingModal] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const userId = parseInt(useLocation().pathname.split("/")[2]);
 
@@ -57,6 +58,7 @@ const Profile = () => {
     ["relationship"],
     () =>
       makeRequest.get(`/getfollow/${userId}`).then((res) => {
+        setIsFollowing(res.data.includes(currentUser.id));
         return res.data;
       })
   );
@@ -71,30 +73,29 @@ const Profile = () => {
       return makeRequest.post("/addfollow", { followedUserId: userId });
     },
     {
-      // Set the onMutate option to update the local state optimistically before the mutation is resolved.
       onMutate: (following) => {
         queryClient.setQueryData(["relationship"], (prevData) => {
-          // Update the relationshipData locally before the mutation is resolved.
           return following
-            ? prevData.filter((id) => id !== currentUser.id) // Remove the currentUser's ID if following is true (unfollow).
-            : [...prevData, currentUser.id]; // Add the currentUser's ID if following is false (follow).
+            ? prevData.filter((id) => id !== currentUser.id)
+            : [...prevData, currentUser.id];
         });
       },
       onError: (error, variables, rollback) => {
-        // Rollback the local state to the previous value in case of an error.
         rollback();
         console.error("Error performing the follow/unfollow action:", error);
       },
-      onSettled: () => {
-        // Refetch the relationshipData after the mutation is resolved to get the updated data from the server.
+      onSuccess: () => {
         queryClient.invalidateQueries(["relationship"]);
       },
     }
   );
-
+  
   const handleFollow = () => {
-    mutation.mutate(relationshipData.includes(currentUser.id));
+    const following = relationshipData && relationshipData.includes(currentUser.id);
+    console.log("Current Relationship Status:", following ? "Following" : "Not Following");
+    mutation.mutate(following);
   };
+  
 
   const handleFollowersClick = () => {
     setOpenFollowersModal(true);
@@ -159,14 +160,20 @@ const Profile = () => {
                   </div>
                 ) : (
                   <div className="followButtons">
+                  {rIsLoading ? (
+                    "Loading..."
+                  ) : (
                     <button onClick={handleFollow}>
-                      {relationshipData.includes(currentUser.id)
+                      {relationshipData && relationshipData.includes(currentUser.id)
                         ? "Following"
                         : "Follow"}
                     </button>
-                    <button onClick={handleFollowersClick}>Followers</button>
-                    <button onClick={handleFollowingClick}>Following</button>
-                  </div>
+                  )}
+                  <button onClick={handleFollowersClick}>Followers</button>
+                  <button onClick={handleFollowingClick}>Following</button>
+                </div>
+                
+                
                 )}
               </div>
               <div className="right">
