@@ -4,10 +4,11 @@ import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 import { format } from "timeago.js";
-
+import Replies from "../replies/replies";
 const Comments = ({ postId }) => {
   const [description, setdescription] = useState("");
   const { currentUser } = useContext(AuthContext);
+  const [activeCommentId, setActiveCommentId] = useState(null);
 
   const { isLoading, error, data } = useQuery(["comments"], () =>
   makeRequest.get(`/comments/${postId}`).then((res) => {
@@ -89,10 +90,13 @@ const Comments = ({ postId }) => {
         <span>{comment.name}</span>
         <p>{comment.description}</p>
       </div>
-     
       <span className="date">{format(convertToCustomFormat(comment.createdAt))}</span>
+      {/* Adding the Replies component with commentId and postId props */}
+      <Replies commentId={comment.id} postId={postId} />
     </div>
   ))
+  
+  
 )}
 
     </div>
